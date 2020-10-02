@@ -1,3 +1,12 @@
+#define CPPLIB_PLATFORM_IMPL
+#define CPPLIB_GRAPHICS_IMPL
+#define CPPLIB_FILESYSTEM_IMPL
+#define CPPLIB_MATHS_IMPL
+#define CPPLIB_MEMORY_IMPL
+#define CPPLIB_UI_IMPL
+#define CPPLIB_FONT_IMPL
+#define CPPLIB_INPUT_IMPL
+#define CPPLIB_COLORS_IMPL
 #include "platform.h"
 #include "graphics.h"
 #include "file_system.h"
@@ -6,7 +15,6 @@
 #include "ui.h"
 #include "font.h"
 #include "input.h"
-#include "random.h"
 #include "colors.h"
 #include <cassert>
 
