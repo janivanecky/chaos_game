@@ -229,7 +229,7 @@ int main(int argc, char **argv) {
             // Render FPS and rendering steps counter.
             char text_buffer[100];
             sprintf_s(text_buffer, 100, "FPS %d", fps);
-            ui::draw_text(text_buffer, ui::get_font(), Vector2(10, float(window_height) - 10), text_color, Vector2(0, 1));
+            ui::draw_text(text_buffer, Vector2(10, float(window_height) - 10), text_color, Vector2(0, 1));
 
             // Render controls UI.
             Panel panel = ui::start_panel("", Vector2(10, 10.0f), 440.0f);
