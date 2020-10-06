@@ -20,15 +20,14 @@
 
 int main(int argc, char **argv) {
     // Set up window
-    uint32_t window_width = 1024, window_height = 1024
-    ;
-    uint32_t render_target_width = window_width, render_target_height = window_height;
- 	Window window = platform::get_window("Chaos Game", window_width, window_height);
-    assert(platform::is_window_valid(&window));
+    uint32_t window_width = 2560, window_height = 1440;
+    uint32_t render_target_width = window_width * 0.5f, render_target_height = window_height * 0.5f;
+    HWND window = platform::get_window("Chaos Game", window_width, window_height);
+    assert(platform::is_window_valid(window));
 
     // Init graphics
     graphics::init();
-    graphics::init_swap_chain(&window);
+    graphics::init_swap_chain(window, window_width, window_height);
 
     // Init UI.
     font::init();
