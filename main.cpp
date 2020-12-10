@@ -33,7 +33,6 @@ int main(int argc, char **argv) {
 
     // Init UI.
     font::init();
-    ui::init();
     ui_draw::init((float)window_width, (float)window_height);
     ui::set_background_opacity(0.0f);
     ui::set_input_responsive(true);
@@ -255,11 +254,10 @@ int main(int argc, char **argv) {
             }
         }
 
-        ui::end();
+        ui::end_frame();
         graphics::swap_frames();
     }
 
-    ui::release();
     graphics::release();
 
     return 0;
