@@ -233,7 +233,7 @@ int main(int argc, char **argv) {
             ui_draw::draw_text(text_buffer, Vector2(10, float(window_height) - 10), text_color, Vector2(0, 1));
 
             // Render controls UI.
-            Panel panel = ui::start_panel("", Vector2(10, 10.0f), 440.0f);
+            Panel panel = ui::start_panel("SETTINGS", Vector2(10, 10.0f));
             bool changed = ui::add_slider(&panel, "step size", &config.step, 0.0f, 1.0f);
             changed |= ui::add_slider(&panel, "vertex count", &config.vertex_count, 2, 10);
             changed |= ui::add_slider(&panel, "polygon_radius", &config.polygon_radius, 200.0f, render_target_width / 2.0f);
