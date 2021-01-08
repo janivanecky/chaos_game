@@ -4,6 +4,16 @@ RWTexture2D<float> tex_out: register(u1);
 cbuffer ConfigBuffer : register(b0) {
     int screen_width;
     int screen_height;
+    float step_size;
+    int iteration;
+
+    int vertex_count;
+    float polygon_radius;
+    int vertex_select_period;
+    int vertex_usage_memory;
+
+    int vertex_usage_memory_offset;
+    float normalize_exp;
 }
 
 // Arrays to store intermediate min/max values.
@@ -25,6 +35,8 @@ void main(uint3 threadIDInGroup : SV_GroupThreadID, uint3 groupID : SV_GroupID,
     for (int y = 0; y < patch_size.y; y++) {
         for (int x = 0; x < patch_size.x; x++) {
             int2 pos = idx + int2(x, y);
+            uint val = min(tex_in[pos], 999);
+            if(tex_in[pos] == 0) continue;
             max_val = max(max_val, tex_in[pos]);
             min_val = min(min_val, tex_in[pos]);
         }
@@ -60,7 +72,13 @@ void main(uint3 threadIDInGroup : SV_GroupThreadID, uint3 groupID : SV_GroupID,
     for (int y = 0; y < patch_size.y; y++) {
         for (int x = 0; x < patch_size.x; x++) {
             int2 pos = idx + int2(x, y);
-            tex_out[pos] = float(tex_in[pos] - vals_min[0]) / float(vals_max[0] - vals_min[0]);
+            if(tex_in[pos] == 0) {
+                tex_out[pos] = tex_in[pos];
+                continue;
+            }
+
+            float normalized_value = float(tex_in[pos] - vals_min[0]) / float(vals_max[0] - vals_min[0]);
+            tex_out[pos] = pow(normalized_value, 1.0f/normalize_exp);
         }
     }
 }

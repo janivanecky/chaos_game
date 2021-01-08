@@ -1,12 +1,14 @@
 # Chaos game
 
-![title.png](imgs/title.png)
+![new_1.png](imgs/new_1.png)
 
 ## Samples
 
+![new_2](imgs/new_2.png)
+![new_3](imgs/new_3.png)
 ![tile.png](imgs/tile.png)
 
-## In action
+## In action (older version)
 
 ![action.gif](imgs/action.gif)
 
