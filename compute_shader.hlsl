@@ -25,17 +25,18 @@ cbuffer ConfigBuffer : register(b0) {
     int step_count;
 }
 
-uint wang_hash(uint seed) {
-    seed = (seed ^ 61) ^ (seed >> 16);
-    seed *= 9;
-    seed = seed ^ (seed >> 4);
-    seed *= 0x27d4eb2d;
-    seed = seed ^ (seed >> 15);
-    return seed;
+uint pcg(uint v){
+    uint state = v * 747796405 + 2891336453;
+    uint word = ((state >> ((state >> 28) + 4)) ^ state) * 277803737;
+    return (word >> 22) ^ word;
+}
+
+uint random_int(int seed) {
+    return pcg(seed);
 }
 
 float random(int seed) {
-    return float(wang_hash(seed) % 1000000) / 1000000.0f;
+    return float(random_int(seed) % 1000000) / 1000000.0f;
 }
 
 float2 trilinear_to_cartesian(float x, float y, float z, float2 A, float2 B, float2 C) {
@@ -59,7 +60,7 @@ int sample_vertex(int seed, inout int used_vertices[max_vertex_count]) {
     }
 
     // Select a next vertex to go to.
-    int selected_vertex = random(seed) * available_vertex_count;
+    int selected_vertex = random_int(seed) % available_vertex_count;
     for(int j = 0; j < vertex_count; ++j) {
         if(used_vertices[j] == 0 && j == selected_vertex) {
             break;
@@ -97,8 +98,8 @@ void main(uint3 threadIDInGroup : SV_GroupThreadID, uint3 group_id : SV_GroupID,
 
     // Set up initial particle position
     float2 p = float2(
-        random(idx * 37) * 2.0f - 1.0f,
-        random(idx * 13) * 2.0f - 1.0f
+        random(idx) * 2.0f - 1.0f,
+        random(idx + 31) * 2.0f - 1.0f
     );
 
     // Set up array storing used vertices.
@@ -111,8 +112,11 @@ void main(uint3 threadIDInGroup : SV_GroupThreadID, uint3 group_id : SV_GroupID,
     int selected_vertex = 0;
     [fastopt]
     for(int i = 0; i < 1000; ++i) {
+        // Iteration-specific index.
+        uint idxx = idx + random_int(i);
+
         // Select vertex.
-        selected_vertex = sample_vertex(idx * 13 * (i + 1), used_vertices);
+        selected_vertex = sample_vertex(idxx, used_vertices);
 
         // A, B, C are vertices of a triangle we're going to move within.
         // A is current position and B, C are randomly seleceted neighboring
@@ -201,7 +205,7 @@ void main(uint3 threadIDInGroup : SV_GroupThreadID, uint3 group_id : SV_GroupID,
 
             // Select one point at random from used points.
             if(point_count > 0) {
-                int point_idx = wang_hash(idx * 33) % point_count;
+                int point_idx = random_int(idxx) % point_count;
                 target = points_used[point_idx];
             }
         } else if (selection_type == BEZIER_QUADRATIC) {
@@ -221,7 +225,7 @@ void main(uint3 threadIDInGroup : SV_GroupThreadID, uint3 group_id : SV_GroupID,
                 if(points[j] & p_isodynamic2) bezier_points[j] = isodynamic2;
             }
             // Compute target point using quadratic bezier equation.
-            float t = max(random(idx), min_t_bezier);
+            float t = max(random(idxx), min_t_bezier);
             float it = 1 - t;
             target = it * it * bezier_points[0] + 2 * it * t * bezier_points[1] + t * t * bezier_points[2];
         } else if (selection_type == BEZIER_CUBIC) {
@@ -241,7 +245,7 @@ void main(uint3 threadIDInGroup : SV_GroupThreadID, uint3 group_id : SV_GroupID,
                 if(points[j] & p_isodynamic2) bezier_points[j] = isodynamic2;
             }
             // Compute target point using cubic bezier equation.
-            float t = max(random(idx), min_t_bezier);
+            float t = max(random(idxx), min_t_bezier);
             float it = 1 - t;
             target = it * it * it * bezier_points[0] +
                 3 * it * it * t * bezier_points[1] +
